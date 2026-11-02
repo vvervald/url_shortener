@@ -1,0 +1,6 @@
+server:
+  read-timeout: 5s
+  write-timeout: 5s
+  idle-timeout: 60s 
+
+
