@@ -163,9 +163,11 @@ func TestSave_Success(t *testing.T) {
 }
 
 func TestSave_InvalidURL(t *testing.T) {
+	calls := 0
 	url := "htps://test.com"
 	body := fmt.Sprintf(`{"url":"%s"}`, url)
 	saveFunc := func(ctx context.Context, originalURL string) (service.URLResult, error) {
+		calls++
 		if url != originalURL {
 			t.Errorf(
 				"expected url %q, got %q",
@@ -213,13 +215,18 @@ func TestSave_InvalidURL(t *testing.T) {
 		t.Errorf("expected error message %q, got %q", ErrInvalidURL.Error(), resp.Error)
 	}
 
+	if calls != 1 {
+		t.Fatalf("service must be called once, number of calls %d", calls)
+	}
 }
 
 func TestSave_InternalError(t *testing.T) {
+	calls := 0
 	url := "https://test.com"
 	body := fmt.Sprintf(`{"url":"%s"}`, url)
 
 	saveFunc := func(ctx context.Context, originalURL string) (service.URLResult, error) {
+		calls++
 		return service.URLResult{}, errors.New("unexpected error")
 	}
 
@@ -265,5 +272,9 @@ func TestSave_InternalError(t *testing.T) {
 			ErrInternal.Error(),
 			resp.Error,
 		)
+	}
+
+	if calls != 1 {
+		t.Fatalf("service must be called once, number of calls %d", calls)
 	}
 }

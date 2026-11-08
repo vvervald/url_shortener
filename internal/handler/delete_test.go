@@ -16,8 +16,11 @@ import (
 
 func TestDelete_Success(t *testing.T) {
 	code := "AdjfD0"
+	calls := 0
 
 	deleteFunc := func(ctx context.Context, recievedCode string) error {
+
+		calls++
 		if code != recievedCode {
 			t.Errorf(
 				"expected code %q, got %q",
@@ -73,12 +76,18 @@ func TestDelete_Success(t *testing.T) {
 			w.Body.String(),
 		)
 	}
+
+	if calls != 1 {
+		t.Fatalf("service must be called once, number of calls %d", calls)
+	}
 }
 
 func TestDelete_NotFound(t *testing.T) {
 	code := "AdjfD0"
+	calls := 0
 
 	deleteFunc := func(ctx context.Context, recievedCode string) error {
+		calls++
 		if code != recievedCode {
 			t.Errorf(
 				"expected code %q, got %q",
@@ -133,11 +142,17 @@ func TestDelete_NotFound(t *testing.T) {
 			w.Body.String(),
 		)
 	}
+
+	if calls != 1 {
+		t.Fatalf("service must be called once, number of calls %d", calls)
+	}
 }
 func TestDelete_InternalError(t *testing.T) {
 	code := "AdjfD0"
+	calls := 0
 
 	deleteFunc := func(ctx context.Context, recievedCode string) error {
+		calls++
 		if code != recievedCode {
 			t.Errorf(
 				"expected code %q, got %q",
@@ -201,5 +216,9 @@ func TestDelete_InternalError(t *testing.T) {
 			ErrInternal.Error(),
 			resp.Error,
 		)
+	}
+
+	if calls != 1 {
+		t.Fatalf("service must be called once, number of calls %d", calls)
 	}
 }

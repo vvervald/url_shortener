@@ -17,7 +17,7 @@ import (
 func TestRedirect_Success(t *testing.T) {
 	code := "AbfdJ2"
 	redirectURL := "http://test.com"
-	count := 0
+	calls := 0
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -38,7 +38,7 @@ func TestRedirect_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	getURLfunc := func(ctx context.Context, recievedCode string) (service.URLResult, error) {
-		count++
+		calls++
 		if recievedCode != code {
 			t.Errorf(
 				"expected code %q, got %q",
@@ -65,11 +65,8 @@ func TestRedirect_Success(t *testing.T) {
 
 	h.Redirect(w, req)
 
-	if count != 1 {
-		t.Errorf(
-			"expected service to be called once, got %d",
-			count,
-		)
+	if calls != 1 {
+		t.Fatalf("service must be called once, number of calls %d", calls)
 	}
 
 	if w.Code != http.StatusFound {
@@ -92,7 +89,7 @@ func TestRedirect_Success(t *testing.T) {
 
 func TestRedirect_NotFound(t *testing.T) {
 	code := "AbfdJ2"
-	count := 0
+	calls := 0
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -113,7 +110,7 @@ func TestRedirect_NotFound(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	getURLfunc := func(ctx context.Context, recievedCode string) (service.URLResult, error) {
-		count++
+		calls++
 		if recievedCode != code {
 			t.Errorf(
 				"expected code %q, got %q",
@@ -136,11 +133,8 @@ func TestRedirect_NotFound(t *testing.T) {
 
 	h.Redirect(w, req)
 
-	if count != 1 {
-		t.Errorf(
-			"expected service to be called once, got %d",
-			count,
-		)
+	if calls != 1 {
+		t.Fatalf("service must be called once, number of calls %d", calls)
 	}
 
 	if w.Code != http.StatusNotFound {
@@ -168,7 +162,7 @@ func TestRedirect_NotFound(t *testing.T) {
 
 func TestRedirect_InternalError(t *testing.T) {
 	code := "AbfdJ2"
-	count := 0
+	calls := 0
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -189,7 +183,7 @@ func TestRedirect_InternalError(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	getURLfunc := func(ctx context.Context, recievedCode string) (service.URLResult, error) {
-		count++
+		calls++
 		if recievedCode != code {
 			t.Errorf(
 				"expected code %q, got %q",
@@ -212,10 +206,10 @@ func TestRedirect_InternalError(t *testing.T) {
 
 	h.Redirect(w, req)
 
-	if count != 1 {
+	if calls != 1 {
 		t.Errorf(
 			"expected service to be called once, got %d",
-			count,
+			calls,
 		)
 	}
 
