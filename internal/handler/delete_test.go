@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	"url-shortener/internal/lib/logger/fake"
+	"url-shortener/internal/mocks"
 	"url-shortener/internal/service"
 
 	"github.com/go-chi/chi/v5"
@@ -28,8 +29,8 @@ func TestDelete_Success(t *testing.T) {
 		return nil
 	}
 
-	mockService := &mockService{
-		deleteURLFunc: deleteFunc,
+	mockService := &mocks.MockService{
+		DeleteURLFunc: deleteFunc,
 	}
 
 	req := httptest.NewRequest(
@@ -88,8 +89,8 @@ func TestDelete_NotFound(t *testing.T) {
 		return service.ErrURLNotFound
 	}
 
-	mockService := &mockService{
-		deleteURLFunc: deleteFunc,
+	mockService := &mocks.MockService{
+		DeleteURLFunc: deleteFunc,
 	}
 
 	req := httptest.NewRequest(
@@ -147,8 +148,8 @@ func TestDelete_InternalError(t *testing.T) {
 		return errors.New("unexpecteed error")
 	}
 
-	mockService := &mockService{
-		deleteURLFunc: deleteFunc,
+	mockService := &mocks.MockService{
+		DeleteURLFunc: deleteFunc,
 	}
 
 	req := httptest.NewRequest(

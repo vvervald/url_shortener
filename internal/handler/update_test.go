@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 	"url-shortener/internal/lib/logger/fake"
+	"url-shortener/internal/mocks"
 	"url-shortener/internal/service"
 
 	"github.com/go-chi/chi/v5"
@@ -107,8 +108,8 @@ func TestUpdate_Success(t *testing.T) {
 				}, nil
 			}
 
-			mock := &mockService{
-				updateURLFunc: updateFunc,
+			mock := &mocks.MockService{
+				UpdateURLFunc: updateFunc,
 			}
 
 			h := NewURLHandler(mock, fake.Logger)
@@ -244,8 +245,8 @@ func TestUpdate_BadRequest(t *testing.T) {
 				return service.URLResult{}, nil
 			}
 
-			mock := &mockService{
-				updateURLFunc: updateFunc,
+			mock := &mocks.MockService{
+				UpdateURLFunc: updateFunc,
 			}
 
 			h := NewURLHandler(mock, fake.Logger)
@@ -339,8 +340,8 @@ func TestUpdate_InvalidURL(t *testing.T) {
 		return service.URLResult{}, service.ErrInvalidURL
 	}
 
-	mock := &mockService{
-		updateURLFunc: updateFunc,
+	mock := &mocks.MockService{
+		UpdateURLFunc: updateFunc,
 	}
 
 	h := NewURLHandler(mock, fake.Logger)
@@ -432,8 +433,8 @@ func TestUpdate_NothingToUpdate(t *testing.T) {
 		return service.URLResult{}, service.ErrNothingToUpdate
 	}
 
-	mock := &mockService{
-		updateURLFunc: updateFunc,
+	mock := &mocks.MockService{
+		UpdateURLFunc: updateFunc,
 	}
 
 	h := NewURLHandler(mock, fake.Logger)
@@ -530,8 +531,8 @@ func TestUpdate_NotFound(t *testing.T) {
 		return service.URLResult{}, service.ErrURLNotFound
 	}
 
-	mock := &mockService{
-		updateURLFunc: updateFunc,
+	mock := &mocks.MockService{
+		UpdateURLFunc: updateFunc,
 	}
 
 	h := NewURLHandler(mock, fake.Logger)
@@ -620,8 +621,8 @@ func TestUpdate_InternalError(t *testing.T) {
 		return service.URLResult{}, internalErr
 	}
 
-	mock := &mockService{
-		updateURLFunc: updateFunc,
+	mock := &mocks.MockService{
+		UpdateURLFunc: updateFunc,
 	}
 
 	h := NewURLHandler(mock, fake.Logger)

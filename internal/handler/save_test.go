@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"url-shortener/internal/lib/logger/fake"
+	"url-shortener/internal/mocks"
 	"url-shortener/internal/service"
 )
 
@@ -52,8 +53,8 @@ func TestSave_BadRequest(t *testing.T) {
 				return service.URLResult{}, nil
 			}
 
-			s := &mockService{
-				saveURLFunc: saveFunc,
+			s := &mocks.MockService{
+				SaveURLFunc: saveFunc,
 			}
 
 			h := NewURLHandler(s, fake.Logger)
@@ -119,8 +120,8 @@ func TestSave_Success(t *testing.T) {
 		}, nil
 	}
 
-	mockService := &mockService{
-		saveURLFunc: saveFunc,
+	mockService := &mocks.MockService{
+		SaveURLFunc: saveFunc,
 	}
 
 	h := NewURLHandler(
@@ -175,8 +176,8 @@ func TestSave_InvalidURL(t *testing.T) {
 		return service.URLResult{}, service.ErrInvalidURL
 	}
 
-	mockService := &mockService{
-		saveURLFunc: saveFunc,
+	mockService := &mocks.MockService{
+		SaveURLFunc: saveFunc,
 	}
 
 	h := NewURLHandler(
@@ -222,8 +223,8 @@ func TestSave_InternalError(t *testing.T) {
 		return service.URLResult{}, errors.New("unexpected error")
 	}
 
-	mockService := &mockService{
-		saveURLFunc: saveFunc,
+	mockService := &mocks.MockService{
+		SaveURLFunc: saveFunc,
 	}
 
 	h := NewURLHandler(
@@ -265,5 +266,4 @@ func TestSave_InternalError(t *testing.T) {
 			resp.Error,
 		)
 	}
-
 }

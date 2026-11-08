@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	"url-shortener/internal/lib/logger/fake"
+	"url-shortener/internal/mocks"
 	"url-shortener/internal/service"
 
 	"github.com/go-chi/chi/v5"
@@ -53,8 +54,8 @@ func TestRedirect_Success(t *testing.T) {
 		}, nil
 	}
 
-	mockService := &mockService{
-		getURLByCode: getURLfunc,
+	mockService := &mocks.MockService{
+		GetURLByCodeFunc: getURLfunc,
 	}
 
 	h := NewURLHandler(
@@ -124,8 +125,8 @@ func TestRedirect_NotFound(t *testing.T) {
 		return service.URLResult{}, service.ErrURLNotFound
 	}
 
-	mockService := &mockService{
-		getURLByCode: getURLfunc,
+	mockService := &mocks.MockService{
+		GetURLByCodeFunc: getURLfunc,
 	}
 
 	h := NewURLHandler(
@@ -200,8 +201,8 @@ func TestRedirect_InternalError(t *testing.T) {
 		return service.URLResult{}, errors.New("unexpected error")
 	}
 
-	mockService := &mockService{
-		getURLByCode: getURLfunc,
+	mockService := &mocks.MockService{
+		GetURLByCodeFunc: getURLfunc,
 	}
 
 	h := NewURLHandler(
