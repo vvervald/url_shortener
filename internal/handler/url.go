@@ -14,7 +14,7 @@ import (
 var (
 	ErrInternal    = errors.New("internal server error")
 	ErrURLNotFound = errors.New("URL not found")
-	ErrInvalidURL  = errors.New("invalid URL")
+	ErrInvalidURL  = errors.New("invalid URL format")
 	ErrInvalidJSON = errors.New("invalid JSON")
 )
 
@@ -64,8 +64,8 @@ func (h *URLHandler) Save(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, service.ErrEmptyURL), errors.Is(err, service.ErrInvalidURL):
 			writeError(w, http.StatusBadRequest, err.Error())
 			return
-		case errors.Is(err, service.ErrCodeGenerationFailed):
-			writeError(w, http.StatusConflict, err.Error())
+		case errors.Is(err, service.ErrURLAlreadyExists):
+			writeError(w, http.StatusInternalServerError, ErrInternal.Error())
 			return
 		default:
 			h.logger.Error("request_failed_save", sl.Err(err))
@@ -156,13 +156,21 @@ func (h *URLHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		switch {
+		case errors.Is(err, service.ErrInvalidURL):
+			writeError(w, http.StatusBadRequest, service.ErrInvalidURL.Error())
+			return
 		case errors.Is(err, service.ErrURLNotFound):
 			writeError(w, http.StatusNotFound, ErrURLNotFound.Error())
 			return
 		case errors.Is(err, service.ErrNothingToUpdate):
 			writeError(w, http.StatusBadRequest, err.Error())
+			return
 		case errors.Is(err, service.ErrCodeGenerationFailed):
-			writeError(w, http.StatusConflict, err.Error())
+			writeError(w, http.StatusInternalServerError, ErrInternal.Error())
+			return
+		case errors.Is(err, service.ErrURLAlreadyExists):
+			writeError(w, http.StatusConflict, ErrInternal.Error())
+			return
 		default:
 			h.logger.Error("request_failed_update", sl.Err(err))
 			writeError(w, http.StatusInternalServerError, ErrInternal.Error())
@@ -185,6 +193,11 @@ func (h *URLHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	err := h.service.DeleteURL(r.Context(), code)
 
 	if err != nil {
+		if errors.Is(err, service.ErrURLNotFound) {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
 		h.logger.Error("request_failed_delete", sl.Err(err))
 		writeError(w, http.StatusInternalServerError, ErrInternal.Error())
 		return
