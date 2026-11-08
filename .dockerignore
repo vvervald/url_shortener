@@ -1,5 +1,6 @@
+.git
 .gitignore 
+.env 
 .env.example 
-Makefile 
 Dockerfile 
 docker-compose.yml 
