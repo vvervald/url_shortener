@@ -59,41 +59,45 @@ func (s *URLService) SaveURL(ctx context.Context, originalURL string) (URLResult
 		return URLResult{}, err
 	}
 
-	url, err := s.repo.GetURLByOriginalURL(ctx, originalURL)
+	for range s.aliasGenMaxAttempts {
+		code, err := s.generateCode(s.codeLength)
 
-	if err == nil {
+		if err != nil {
+			return URLResult{}, err
+		}
+
+		url, err := s.repo.Create(ctx, originalURL, code)
+
+		if err != nil {
+			switch {
+			case errors.Is(err, repository.ErrCodeAlreadyExists):
+				continue
+			case errors.Is(err, repository.ErrURLAlreadyExists):
+				url, err := s.repo.GetURLByOriginalURL(ctx, originalURL)
+
+				if err == nil {
+					return s.toResult(url), nil
+				}
+
+				return URLResult{}, err
+			default:
+				return URLResult{}, err
+			}
+		}
+
 		return s.toResult(url), nil
 	}
 
-	if errors.Is(err, repository.ErrNotFound) {
-		for range s.aliasGenMaxAttempts {
-			code, err := s.generateCode(s.codeLength)
-
-			if err != nil {
-				return URLResult{}, err
-			}
-
-			url, err := s.repo.Create(ctx, originalURL, code)
-
-			if err != nil {
-				if errors.Is(err, repository.ErrCodeAlreadyExists) {
-					continue
-				}
-				return URLResult{}, ErrCodeGenerationFailed
-			}
-
-			return s.toResult(url), nil
-		}
-
-		return URLResult{}, ErrCodeGenerationFailed
-
-	}
-
-	return URLResult{}, err
+	return URLResult{}, ErrCodeGenerationFailed
 }
 
 func (s *URLService) DeleteURL(ctx context.Context, code string) error {
 	if err := s.repo.DeleteURLByCode(ctx, code); err != nil {
+
+		if errors.Is(err, repository.ErrNotFound) {
+			return ErrURLNotFound
+		}
+
 		return err
 	}
 
