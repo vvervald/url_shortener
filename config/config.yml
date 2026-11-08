@@ -1,0 +1,9 @@
+app_env: local
+app_name: url-shortener
+alias_generation_max_attempts: 3
+alias_code_length: 6
+http_server:
+    address: localhost:5050
+    write_timeout: 5s 
+    read_timeout: 10s 
+    idle_timeout: 60s
