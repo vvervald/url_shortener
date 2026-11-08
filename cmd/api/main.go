@@ -69,9 +69,9 @@ func main() {
 		r.Use(
 			middleware.RequestID,
 			appmiddleware.LoggingMiddleware(logger),
-			// middleware.BasicAuth(cfg.AppName, map[string]string{
-			// 	cfg.HTTPServer.User: cfg.HTTPServer.Password,
-			// }),
+			middleware.BasicAuth(cfg.AppName, map[string]string{
+				cfg.HTTPServer.User: cfg.HTTPServer.Password,
+			}),
 			middleware.Recoverer,
 		)
 		r.Route("/urls", func(r chi.Router) {
