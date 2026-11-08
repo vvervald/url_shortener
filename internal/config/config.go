@@ -25,8 +25,8 @@ type HTTPServer struct {
 	WriteTimeout time.Duration `yaml:"write_timeout" env:"HTTP_WRITE_TIMEOUT" env-default:"5s"`
 	ReadTimeout  time.Duration `yaml:"read_timeout" env:"HTTP_READ_TIMEOUT" env-default:"10s"`
 	IdleTimeout  time.Duration `yaml:"idle_timeout" env:"HTTP_IDLE_TIMEOUT" env-default:"60s"`
-	User         string        `yaml:"user" env-required:"true" env:"USER"`
-	Password     string        `yaml:"password" env-required:"true" env:"PASSWORD"`
+	User         string        `yaml:"user" env-required:"true" env:"BASIC_AUTH_USER"`
+	Password     string        `yaml:"password" env-required:"true" env:"BASIC_AUTH_PASSWORD"`
 }
 
 func Load() (Config, error) {
