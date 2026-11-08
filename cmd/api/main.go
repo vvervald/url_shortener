@@ -14,12 +14,10 @@ import (
 	"url-shortener/internal/config"
 	"url-shortener/internal/handler"
 	"url-shortener/internal/lib/logger/sl"
-	appmiddleware "url-shortener/internal/middleware"
 	"url-shortener/internal/repository"
+	"url-shortener/internal/router"
 	"url-shortener/internal/service"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -54,43 +52,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	r := chi.NewRouter()
 	repo := repository.NewURLRepository(pool)
 	s := service.NewURLService(cfg.HTTPServer.Address, cfg.AliasCodeLength, cfg.AliasGenMaxAttempts, repo)
 	h := handler.NewURLHandler(s, logger)
 
-	// routes
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
-	})
-
-	r.Route("/api", func(r chi.Router) {
-		r.Use(
-			middleware.RequestID,
-			appmiddleware.LoggingMiddleware(logger),
-			middleware.BasicAuth(cfg.AppName, map[string]string{
-				cfg.HTTPServer.User: cfg.HTTPServer.Password,
-			}),
-			middleware.Recoverer,
-		)
-		r.Route("/urls", func(r chi.Router) {
-			r.Post("/", h.Save)
-			r.Get("/{code}", h.Get)
-			r.Delete("/{code}", h.Delete)
-			r.Patch("/{code}", h.Update)
-		})
-	})
-
-	r.Group(func(r chi.Router) {
-		r.Use(
-			middleware.RequestID,
-			appmiddleware.LoggingMiddleware(logger),
-			middleware.Recoverer,
-		)
-
-		r.Get("/{code}", h.Redirect)
-	})
+	r := router.NewRouter(cfg, h, logger)
 
 	server := &http.Server{
 		Addr:         cfg.HTTPServer.Address,
