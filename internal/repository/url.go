@@ -57,9 +57,9 @@ func (r *URLRepository) Create(ctx context.Context, originalURL, code string) (m
 	); err != nil {
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
 			switch pgErr.ConstraintName {
-			case "urls_original_url_unique":
+			case "urls_original_url_key":
 				return url, ErrURLAlreadyExists
-			case "urls_code_unique":
+			case "urls_code_key":
 				return url, ErrCodeAlreadyExists
 			}
 		}

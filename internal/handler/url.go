@@ -64,9 +64,6 @@ func (h *URLHandler) Save(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, service.ErrEmptyURL), errors.Is(err, service.ErrInvalidURL):
 			writeError(w, http.StatusBadRequest, err.Error())
 			return
-		case errors.Is(err, service.ErrURLAlreadyExists):
-			writeError(w, http.StatusInternalServerError, ErrInternal.Error())
-			return
 		default:
 			h.logger.Error("request_failed_save", sl.Err(err))
 			writeError(w, http.StatusInternalServerError, ErrInternal.Error())
