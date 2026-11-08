@@ -1,21 +1,21 @@
-FROM golang:1.27-alpine AS builder 
+FROM golang:1.27-alpine AS builder
 
-WORKDIR /app 
+WORKDIR /app
 
-COPY go.mod go.sum ./ 
+COPY go.mod go.sum ./
+RUN go mod download
 
-RUN go mod download 
+COPY . .
 
-COPY . . 
-
-RUN go build -o app ./cmd/api 
+RUN CGO_ENABLED=0 GOOS=linux go build -o app ./cmd/api
 
 FROM alpine:3.22
 
-WORKDIR /opt/goapp 
+WORKDIR /opt/goapp
 
-COPY --from=builder /app/app app 
+COPY --from=builder /app/app ./app
+COPY --from=builder /app/config ./config
 
-CMD ["/opt/goapp/app"]
+ENV CONFIG_PATH=/opt/goapp/config/config.yml
 
-
+CMD ["./app"]

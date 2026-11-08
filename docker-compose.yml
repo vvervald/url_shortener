@@ -4,10 +4,11 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - ${HTTP_PORT}:${HTTP_PORT}
-    
+      - "${HTTP_PORT:-5050}:5050"
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL_DOCKER}
     depends_on:
       db:
         condition: service_healthy
@@ -44,7 +45,7 @@ services:
       "-path", 
       "/migrations", 
       "-database", 
-      "${DATABASE_URL}", 
+      "${DATABASE_URL_DOCKER}", 
       "up" 
     ] 
 
