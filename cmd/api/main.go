@@ -78,6 +78,7 @@ func main() {
 			r.Post("/", h.Save)
 			r.Get("/{code}", h.Get)
 			r.Delete("/{code}", h.Delete)
+			r.Patch("/{code}", h.Update)
 		})
 	})
 
