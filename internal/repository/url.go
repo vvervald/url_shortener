@@ -107,6 +107,10 @@ func (r *URLRepository) DeleteURLByCode(ctx context.Context, code string) error 
 	)
 
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrNotFound
+		}
+
 		return err
 	}
 
